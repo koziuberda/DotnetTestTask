@@ -53,7 +53,7 @@ public class PurchaseTests : BaseTest
 
         // Act
         var tasks = Enumerable.Range(0, 5).Select(_ =>
-            Rait<MarketController>().Call(controller => controller.BuyAsync(user.Id, item.Id))
+            Rait<MarketController>().CallH(controller => controller.BuyAsync(user.Id, item.Id))
         );
 
         await Task.WhenAll(tasks);

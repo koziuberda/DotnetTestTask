@@ -15,8 +15,17 @@ public class MarketController : ControllerBase
     }
 
     [HttpPost]
-    public async Task BuyAsync(int userId, int itemId)
+    public async Task<IActionResult> BuyAsync(int userId, int itemId)
     {
-        await _marketService.BuyAsync(userId, itemId);
+        // Adding error handling middleware would be so much better...
+        try
+        {
+            await _marketService.BuyAsync(userId, itemId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest();
+        }
     }
 }

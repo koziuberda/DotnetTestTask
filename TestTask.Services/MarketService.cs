@@ -7,13 +7,22 @@ namespace TestTask.Services;
 public class MarketService
 {
     private readonly TestDbContext _testDbContext;
+    private readonly UserLockManager _userLockManager;
 
-    public MarketService(TestDbContext testDbContext)
+    public MarketService(
+        TestDbContext testDbContext, 
+        UserLockManager userLockManager)
     {
         _testDbContext = testDbContext;
+        _userLockManager = userLockManager;
     }
 
     public async Task BuyAsync(int userId, int itemId)
+    {
+        await _userLockManager.ExecuteWithLockAsync(userId, async () => await ProcessPurchaseAsync(userId, itemId));
+    }
+
+    private async Task ProcessPurchaseAsync(int userId, int itemId)
     {
         var user = await _testDbContext.Users.FirstOrDefaultAsync(n => n.Id == userId);
         if (user == null)
@@ -23,9 +32,8 @@ public class MarketService
             throw new Exception("Item not found");
 
         if (user.Balance < item.Cost)
-        {
-            if (item == null)
-                throw new Exception("Not enough balance");
+        { 
+            throw new Exception("Not enough balance");
         }
 
         user.Balance -= item.Cost;
