@@ -52,4 +52,16 @@ public class TestDbContext : DbContext
         if (!_initialized)
             optionsBuilder.UseNpgsql();
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserItem>()
+            .Property(e => e.PurchaseDate)
+            .HasConversion(
+                v => v.ToUniversalTime(), 
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc) 
+            );
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
